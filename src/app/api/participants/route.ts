@@ -10,9 +10,6 @@ export async function POST() {
     return NextResponse.json(participant);
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Failed to create participant" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create participant" }, { status: 500 });
   }
 }

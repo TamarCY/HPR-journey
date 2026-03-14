@@ -15,9 +15,23 @@ datasource db {
 
 model Participant {
   id                    String    @id @default(uuid())
+  studyNumber           Int       @unique
   status                String    @default("NOT_STARTED")
   createdAt             DateTime  @default(now())
   lastSeenAt            DateTime?
   onboardingCompletedAt DateTime?
   eddDate               DateTime? @db.Date
+
+  tokens                ParticipantToken[]
 }
+
+model ParticipantToken {
+  id            String      @id @default(uuid())
+  participantId String
+  tokenHash     String      @unique
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+
+  participant   Participant @relation(fields: [participantId], references: [id])
+}
+
