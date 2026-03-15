@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 
 export async function getSession() {
   const cookieStore = await cookies();
-  const sessionId = cookieStore.get("sessionId")?.value;
+  const sessionId = cookieStore.get("participant_session")?.value;
 
   if (!sessionId) return null;
 

@@ -1,3 +1,6 @@
+// TEMP: token entry route for MVP.
+// Validates participant token, creates session, and redirects to onboarding or app.
+
 import { prisma } from "@/lib/db";
 import { createSession } from "../../../lib/session";
 import crypto from "crypto";
@@ -27,11 +30,13 @@ export async function GET(
 
   cookieStore.set("participant_session", session.id, {
     httpOnly: true,
-    secure: false,
+    secure: false, // TEMP: use true in production with HTTPS
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   });
 
-  return NextResponse.redirect(new URL("/app", request.url));
+  const redirectPath = participantToken.participant.eddDate ? "/app" : "/app/onboarding";
+
+  return NextResponse.redirect(new URL(redirectPath, request.url));
 }
