@@ -1,25 +1,48 @@
-// TEMP: create participant + personal access link
+// TEMP: create a participant and return a personal access link.
+// Replace or protect before real production use.
 
 import { prisma } from "@/lib/db";
 import { createParticipantToken } from "@/lib/tokens";
 import { NextResponse } from "next/server";
 
-export async function POST() {
-  // create participant
-  const participant = await prisma.participant.create({
-    data: {
-      studyNumber: Math.floor(Math.random() * 100000),
-    },
-  });
+export async function POST(request: Request) {
+  try {
+    const lastParticipant = await prisma.participant.findFirst({
+      orderBy: {
+        studyNumber: "desc",
+      },
+    });
 
-  // generate token + personal link
-  const { personalUrl } = await createParticipantToken({
-    participantId: participant.id,
-    baseUrl: "http://localhost:3000",
-  });
+    const nextStudyNumber = (lastParticipant?.studyNumber ?? 0) + 1;
 
-  return NextResponse.json({
-    participantId: participant.id,
-    link: personalUrl,
-  });
+    const participant = await prisma.participant.create({
+      data: {
+        studyNumber: nextStudyNumber,
+        status: "NOT_STARTED",
+      },
+    });
+
+    const baseUrl = new URL(request.url).origin;
+
+    const { personalUrl, participantToken } = await createParticipantToken({
+      participantId: participant.id,
+      baseUrl,
+    });
+
+    return NextResponse.json({
+      participant: {
+        id: participant.id,
+        studyNumber: participant.studyNumber,
+        status: participant.status,
+      },
+      token: {
+        id: participantToken.id,
+      },
+      personalUrl,
+    });
+  } catch (error) {
+    console.error("Failed to create participant:", error);
+
+    return NextResponse.json({ error: "Failed to create participant" }, { status: 500 });
+  }
 }
