@@ -1,0 +1,14 @@
+import crypto from "crypto";
+
+export function generateParticipantToken() {
+  // create random token
+  const token = crypto.randomBytes(32).toString("hex");
+
+  // hash token for database storage
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+  return {
+    token,
+    tokenHash,
+  };
+}

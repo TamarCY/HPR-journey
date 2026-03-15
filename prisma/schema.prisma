@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  engineType = "binary"
 }
 
 datasource db {
@@ -14,15 +13,16 @@ datasource db {
 }
 
 model Participant {
-  id                    String    @id @default(uuid())
-  studyNumber           Int       @unique
-  status                String    @default("NOT_STARTED")
-  createdAt             DateTime  @default(now())
+  id                    String             @id @default(uuid())
+  studyNumber           Int                @unique
+  status                String             @default("NOT_STARTED")
+  createdAt             DateTime           @default(now())
   lastSeenAt            DateTime?
   onboardingCompletedAt DateTime?
-  eddDate               DateTime? @db.Date
+  eddDate               DateTime?          @db.Date
 
   tokens                ParticipantToken[]
+  sessions              Session[]
 }
 
 model ParticipantToken {
@@ -35,3 +35,12 @@ model ParticipantToken {
   participant   Participant @relation(fields: [participantId], references: [id])
 }
 
+model Session {
+  id            String      @id @default(uuid())
+  participantId String
+  createdAt     DateTime    @default(now())
+  expiresAt     DateTime
+  lastSeenAt    DateTime    @default(now())
+
+  participant   Participant @relation(fields: [participantId], references: [id])
+}
