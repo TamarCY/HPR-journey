@@ -1,5 +1,5 @@
-// TEMP: participant dashboard placeholder.
-// Displays today's activity until real activity system is implemented.
+// TEMP: styled participant dashboard placeholder.
+// Replace static content with real activity logic later.
 
 import { getSession } from "@/lib/getSession";
 import { prisma } from "@/lib/db";
@@ -20,41 +20,78 @@ export default async function AppPage() {
     redirect("/app/onboarding");
   }
 
+  const pregnancyWeek = 18; // TEMP: replace with real calculation
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-rose-50 px-6 py-10">
-      <div className="mx-auto max-w-md space-y-6">
-        <div className="text-center">
-          <p className="mb-2 text-sm font-medium uppercase tracking-[0.2em] text-rose-400">
-            TEMP DASHBOARD
-          </p>
-          <p className="mt-3 text-sm leading-6 text-gray-600">
-            Your personalized daily activity is ready.
-          </p>
-        </div>
-
-        <div className="overflow-hidden rounded-3xl border border-white/70 bg-white/90 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.18)] backdrop-blur">
-          <div className="bg-gradient-to-r from-rose-100 via-pink-50 to-white p-6">
-            <div className="mb-3 inline-flex rounded-full bg-white/80 px-3 py-1 text-sm font-medium text-rose-600">
-              Today’s activity
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Gentle Breathing Practice
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-gray-600">
-              Take a few minutes to slow down, breathe, and connect with yourself.
-            </p>
-          </div>
-
-          <div className="p-6">
-            <button className="w-full rounded-2xl bg-gray-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-gray-800">
-              Play
+    <main className="min-h-screen bg-[#f7f3ef] px-4 py-6 text-[#4b4a46]">
+      <div className="mx-auto max-w-sm">
+        <section className="mb-5 border-b border-[#d9d2ca] pb-5 text-center">
+          <h1 className="font-serif text-4xl font-semibold tracking-tight text-[#4f4a46]">
+            good morning
+          </h1>
+          <p className="mt-3 text-[15px] text-[#61725f]">
+            you're in week{" "}
+            <button className="border-b border-[#61725f] leading-none">
+              {pregnancyWeek}
             </button>
+          </p>
+        </section>
 
-            <p className="mt-4 text-center text-xs text-gray-400">
-              TEMP content — replace with real activity logic later
-            </p>
+        <section className="mb-5">
+          <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-[#d9d2ca] bg-[#fbf8f5] shadow-sm">
+            <button className="bg-[#eef0ea] px-4 py-4 text-lg text-[#546553]">
+              Morning breathing
+            </button>
+            <button className="border-l border-[#d9d2ca] bg-[#fbf8f5] px-4 py-4 text-lg text-[#5d5b57]">
+              Night breathing
+            </button>
           </div>
-        </div>
+        </section>
+
+        <section className="mb-5 rounded-3xl border border-[#d9d2ca] bg-[#fbf8f5] p-4 shadow-sm">
+          <h2 className="mb-4 text-center font-serif text-4xl font-semibold text-[#4f4a46]">
+            Weekly Task
+          </h2>
+
+          <div className="mb-4 rounded-2xl bg-[#f1ece5] px-4 py-3 text-center text-lg text-[#5a6a57]">
+            Preparing for overwhelming moments
+          </div>
+
+          <div className="relative overflow-hidden rounded-[28px] bg-[#f6efe7] p-4">
+            <div className="absolute left-5 top-5 h-16 w-16 rounded-full bg-[#f2c98d]/70 blur-sm" />
+            <div className="absolute bottom-8 left-6 h-20 w-24 rounded-full bg-[#efc08d]/45 blur-sm" />
+            <div className="absolute bottom-10 right-10 h-24 w-24 rounded-full bg-[#e7dcc8]/60 blur-sm" />
+
+            <div className="flex min-h-[280px] items-center justify-center">
+              <div className="text-center text-[#8b857f]">
+                <div className="mx-auto mb-4 flex h-48 w-48 items-center justify-center rounded-full bg-[#f8f3ec] text-sm shadow-inner">
+                  pregnancy illustration
+                </div>
+                <p className="text-sm">TEMP illustration placeholder</p>
+              </div>
+            </div>
+
+            <button className="absolute bottom-5 right-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#f3f1eb] shadow-md transition hover:scale-105">
+              <span className="ml-1 text-2xl text-[#6b7e68]">▶</span>
+            </button>
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-[#d9d2ca] bg-[#fbf8f5] p-4 shadow-sm">
+          <h3 className="mb-3 font-serif text-2xl font-semibold text-[#4f4a46]">
+            Test Preparations
+          </h3>
+
+          <button className="flex w-full items-center justify-between rounded-2xl bg-white px-4 py-4 text-left shadow-sm ring-1 ring-[#ece4dc]">
+            <div>
+              <p className="text-lg text-[#4f4a46]">
+                Preparing for the second trimester scan
+              </p>
+              <p className="mt-1 text-base text-[#6b6a66]">Weeks 19–22</p>
+            </div>
+            <span className="text-3xl text-[#6b6a66]">›</span>
+          </button>
+        </section>
       </div>
     </main>
   );
