@@ -1,38 +1,65 @@
-import Image from "next/image";
+// ⚠️ TEMP DEV PAGE
+// This page is only for development.
+// It allows creating test participants and accessing the app quickly.
+// ❗ DELETE this page before production release.
 
-export default function Home() {
+"use client";
+
+export default function HomePage() {
+  const handleCreateParticipant = async () => {
+    try {
+      const res = await fetch("/api/create-participant", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      if (data.personalUrl) {
+        window.location.href = data.personalUrl;
+      } else {
+        alert("Failed to create participant");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error creating participant");
+    }
+  };
+
+  const handleOpenTestUser = () => {
+    // ⚠️ Replace this with a real permanent test link
+    const testUrl =
+      "https://hpr-journey-app.vercel.app/t/f535ff52f818c07a04b101f217160a68e21961c46423994c66c5b802d32cd154";
+
+    window.location.href = testUrl;
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          HPR - first page :-)
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="flex min-h-screen items-center justify-center bg-[#f7f3ef] px-6">
+      <div className="w-full max-w-sm space-y-6 text-center">
+        <h1 className="font-serif text-3xl text-[#4f4a46]">HPR Journey (Dev Panel)</h1>
+
+        <p className="text-sm text-[#6b6a66]">Temporary development tools</p>
+
+        {/* Create new participant */}
+        <button
+          onClick={handleCreateParticipant}
+          className="w-full rounded-xl bg-[#6b7e68] px-4 py-4 text-white shadow-md transition hover:opacity-90"
+        >
+          Create New Participant
+        </button>
+
+        {/* Open test user */}
+        <button
+          onClick={handleOpenTestUser}
+          className="w-full rounded-xl border border-[#d9d2ca] bg-white px-4 py-4 text-[#4f4a46] shadow-sm"
+        >
+          Open Test User
+        </button>
+
+        <p className="text-xs text-[#a09b95]">
+          ⚠️ This screen is temporary and should be removed before release
+        </p>
+      </div>
+    </main>
   );
 }
