@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       },
     });
 
-    const nextStudyNumber = (lastParticipant?.studyNumber ?? 0) + 1;
+    const nextStudyNumber = lastParticipant ? lastParticipant.studyNumber + 1 : 1;
 
     const participant = await prisma.participant.create({
       data: {

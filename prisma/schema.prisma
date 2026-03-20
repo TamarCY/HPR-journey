@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,17 +6,72 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ParticipantStatus {
+  NOT_STARTED
+  ONBOARDING_REQUIRED
+  ACTIVE
+  COMPLETED
+}
+
+enum DatingMethod {
+  LMP
+  EDD
+  WEEK_AT_ONBOARDING
+  MANUAL_EDIT
+}
+
+enum ActivityType {
+  BREATHING
+  WEEKLY
+  TEST_PREP
+}
+
+enum BreathingSlot {
+  MORNING
+  NIGHT
+}
+
+enum CompletionSource {
+  FINISHED_BUTTON
+  AUTO_PLAYBACK_END
+}
+
+enum EventType {
+  PAGE_OPEN
+  ONBOARDING_STARTED
+  ONBOARDING_COMPLETED
+  ACTIVITY_STARTED
+  ACTIVITY_COMPLETED
+}
+
 model Participant {
-  id                    String             @id @default(uuid())
-  studyNumber           Int                @unique
-  status                String             @default("NOT_STARTED")
-  createdAt             DateTime           @default(now())
+  id                    String            @id @default(uuid())
+  studyNumber           Int               @unique
+  status                ParticipantStatus @default(NOT_STARTED)
+
+  // unified canonical field used to calculate pregnancy week
+  gestationalAnchorDate DateTime?         @db.Date
+
+  // original onboarding inputs
+  lmpDate               DateTime?         @db.Date
+  eddDate               DateTime?         @db.Date
+  weekAtOnboarding      Int?
+  onboardingDate        DateTime?         @db.Date
+
+  // metadata about dating source
+  datingMethod          DatingMethod?
+  lastManualWeekEditAt  DateTime?
+
+  timezone              String            @default("America/New_York")
+
+  createdAt             DateTime          @default(now())
   lastSeenAt            DateTime?
   onboardingCompletedAt DateTime?
-  eddDate               DateTime?          @db.Date
 
   tokens                ParticipantToken[]
   sessions              Session[]
+  activityProgress      ActivityProgress[]
+  eventLogs             EventLog[]
 }
 
 model ParticipantToken {
@@ -30,17 +79,110 @@ model ParticipantToken {
   participantId String
   tokenHash     String      @unique
   isActive      Boolean     @default(true)
-  createdAt     DateTime    @default(now())
 
-  participant   Participant @relation(fields: [participantId], references: [id])
+  createdAt     DateTime    @default(now())
+  usedAt        DateTime?
+  revokedAt     DateTime?
+
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@index([participantId])
 }
 
 model Session {
   id            String      @id @default(uuid())
   participantId String
+
   createdAt     DateTime    @default(now())
   expiresAt     DateTime
   lastSeenAt    DateTime    @default(now())
 
-  participant   Participant @relation(fields: [participantId], references: [id])
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@index([participantId])
+  @@index([expiresAt])
+}
+
+model Activity {
+  id               String         @id @default(uuid())
+  type             ActivityType
+
+  title            String
+  subtitle         String?
+  contentText      String?
+
+  audioUrl         String?
+  videoUrl         String?
+  imageUrl         String?
+
+  // only relevant for breathing activities
+  breathingSlot    BreathingSlot?
+
+  // week visibility / availability
+  minPregnancyWeek Int?
+  maxPregnancyWeek Int?
+
+  orderIndex       Int            @default(0)
+  isActive         Boolean        @default(true)
+
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  progress         ActivityProgress[]
+  eventLogs        EventLog[]
+
+  @@index([type])
+  @@index([breathingSlot])
+  @@index([minPregnancyWeek, maxPregnancyWeek])
+  @@index([orderIndex])
+}
+
+model ActivityProgress {
+  id               String           @id @default(uuid())
+  participantId    String
+  activityId       String
+
+  // for daily breathing reset
+  progressDate     DateTime?        @db.Date
+
+  // snapshot of current pregnancy week when progress happened
+  pregnancyWeek    Int?
+
+  startedAt        DateTime?
+  completedAt      DateTime?
+  completionSource CompletionSource?
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  participant      Participant      @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  activity         Activity         @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@index([participantId])
+  @@index([activityId])
+  @@index([progressDate])
+  @@index([pregnancyWeek])
+
+  // prevents duplicate daily progress rows for the same day
+  @@unique([participantId, activityId, progressDate])
+}
+
+model EventLog {
+  id             String      @id @default(uuid())
+  participantId  String
+  activityId     String?
+
+  eventType      EventType
+  pregnancyWeek  Int?
+  occurredAt     DateTime    @default(now())
+
+  metadata       Json?
+
+  participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  activity       Activity?   @relation(fields: [activityId], references: [id], onDelete: SetNull)
+
+  @@index([participantId])
+  @@index([activityId])
+  @@index([eventType])
+  @@index([occurredAt])
 }
