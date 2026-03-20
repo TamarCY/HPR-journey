@@ -1,8 +1,9 @@
-// TEMP: styled participant dashboard placeholder.
-// Replace static content with real activity logic later.
+// TEMP: participant home screen.
+// Replace static content with final product UI and full activity logic later.
 
 import { getSession } from "@/lib/getSession";
 import { prisma } from "@/lib/db";
+import { calculatePregnancyWeek } from "@/lib/pregnancy";
 import { redirect } from "next/navigation";
 
 export default async function AppPage() {
@@ -16,11 +17,15 @@ export default async function AppPage() {
     where: { id: session.participantId },
   });
 
-  if (!participant?.eddDate) {
+  if (!participant) {
+    redirect("/unauthorized");
+  }
+
+  if (!participant.onboardingCompletedAt || !participant.gestationalAnchorDate) {
     redirect("/app/onboarding");
   }
 
-  const pregnancyWeek = 18; // TEMP: replace with real calculation
+  const pregnancyWeek = calculatePregnancyWeek(participant.gestationalAnchorDate);
 
   return (
     <main className="min-h-screen bg-[#f7f3ef] px-4 py-6 text-[#4b4a46]">
@@ -58,17 +63,8 @@ export default async function AppPage() {
           </div>
 
           <div className="relative overflow-hidden rounded-[28px] bg-[#f6efe7] p-4">
-            <div className="absolute left-5 top-5 h-16 w-16 rounded-full bg-[#f2c98d]/70 blur-sm" />
-            <div className="absolute bottom-8 left-6 h-20 w-24 rounded-full bg-[#efc08d]/45 blur-sm" />
-            <div className="absolute bottom-10 right-10 h-24 w-24 rounded-full bg-[#e7dcc8]/60 blur-sm" />
-
-            <div className="flex min-h-[280px] items-center justify-center">
-              <div className="text-center text-[#8b857f]">
-                <div className="mx-auto mb-4 flex h-48 w-48 items-center justify-center rounded-full bg-[#f8f3ec] text-sm shadow-inner">
-                  pregnancy illustration
-                </div>
-                <p className="text-sm">TEMP illustration placeholder</p>
-              </div>
+            <div className="flex min-h-[220px] items-center justify-center text-[#8b857f]">
+              TEMP weekly task content
             </div>
 
             <button className="absolute bottom-5 right-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#f3f1eb] shadow-md transition hover:scale-105">

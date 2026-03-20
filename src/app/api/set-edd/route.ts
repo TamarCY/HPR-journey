@@ -1,5 +1,3 @@
-// TEMP: API route for saving participant EDD during onboarding.
-
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
 import { NextResponse } from "next/server";
@@ -13,10 +11,19 @@ export async function POST(request: Request) {
 
   const { edd } = await request.json();
 
+  const eddDate = new Date(edd);
+
+  // canonical pregnancy anchor = EDD - 280 days
+  const gestationalAnchorDate = new Date(eddDate);
+  gestationalAnchorDate.setDate(gestationalAnchorDate.getDate() - 280);
+
   await prisma.participant.update({
     where: { id: session.participantId },
     data: {
-      eddDate: new Date(edd),
+      eddDate,
+      gestationalAnchorDate,
+      onboardingCompletedAt: new Date(),
+      status: "ACTIVE",
     },
   });
 
