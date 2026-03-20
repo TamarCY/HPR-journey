@@ -9,6 +9,7 @@ import { getSession } from "@/lib/getSession";
 import { prisma } from "@/lib/db";
 import { calculatePregnancyWeek, getGreeting } from "@/lib/pregnancy";
 import Image from "next/image";
+import EditPregnancyWeek from "@/components/EditPregnancyWeek";
 
 export default async function AppPage() {
   const session = await getSession();
@@ -86,10 +87,7 @@ export default async function AppPage() {
             {greeting}
           </h1>
           <p className="mt-2 text-[1rem] text-[#6d6661]">
-            you&apos;re in week{" "}
-            <button className="border-b border-[#6d6661] leading-none">
-              {pregnancyWeek}
-            </button>
+            you&apos;re in week <EditPregnancyWeek currentWeek={pregnancyWeek} />
           </p>
         </section>
 
