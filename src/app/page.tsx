@@ -26,11 +26,11 @@ export default function HomePage() {
   };
 
   const handleOpenTestUser = () => {
-    // ⚠️ Replace this with a real permanent test link
-    const testUrl =
-      "https://hpr-journey-app.vercel.app/t/0b7f476f00d84ed818b76b1962a83ae4100908ec504eea9d159f704edc887428";
+    const token = "0b7f476f00d84ed818b76b1962a83ae4100908ec504eea9d159f704edc887428";
 
-    window.location.href = testUrl;
+    const baseUrl = window.location.origin;
+
+    window.location.href = `${baseUrl}/t/${token}`;
   };
 
   return (
