@@ -99,6 +99,16 @@ export default async function ActivityPage({
             </div>
           )}
 
+          {/* Text content */}
+          {activity.contentText && (
+            <div className="mt-5 rounded-[24px] bg-[#f6efe7] p-5">
+              <div
+                className="text-[0.98rem] leading-7 text-[#6d6661] space-y-3 [&_ul]:pl-5 [&_ul]:list-disc"
+                dangerouslySetInnerHTML={{ __html: activity.contentText }}
+              />
+            </div>
+          )}
+
           {!activity.videoUrl && !activity.audioUrl && !activity.contentText && (
             <div className="mt-5 rounded-[24px] bg-[#f6efe7] p-5 text-sm text-[#8b857f]">
               No activity content available yet.
