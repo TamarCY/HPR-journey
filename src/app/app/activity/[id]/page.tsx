@@ -72,12 +72,15 @@ export default async function ActivityPage({
           {activity.videoUrl && (
             <div className="mt-5">
               <video
+                key={activity.videoUrl}
+                src={activity.videoUrl}
                 controls
                 playsInline
+                muted
                 preload="metadata"
                 className="w-full rounded-[24px] bg-black"
               >
-                <source src={activity.videoUrl} />
+                Your browser does not support the video tag.
               </video>
             </div>
           )}
@@ -85,18 +88,14 @@ export default async function ActivityPage({
           {/* Audio */}
           {activity.audioUrl && (
             <div className="mt-5 rounded-[24px] bg-[#f6efe7] p-4">
-              <audio controls preload="metadata" className="w-full">
-                <source src={activity.audioUrl} />
+              <audio
+                src={activity.audioUrl}
+                controls
+                preload="metadata"
+                className="w-full"
+              >
+                Your browser does not support the audio element.
               </audio>
-            </div>
-          )}
-
-          {/* Text */}
-          {activity.contentText && (
-            <div className="mt-5 rounded-[24px] bg-[#f6efe7] p-5">
-              <p className="text-[0.98rem] leading-7 text-[#6d6661]">
-                {activity.contentText}
-              </p>
             </div>
           )}
 
