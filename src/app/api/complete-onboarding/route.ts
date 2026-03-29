@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     }
 
     gestationalAnchorDate = new Date(today);
-    gestationalAnchorDate.setDate(today.getDate() - (week - 1) * 7);
+    gestationalAnchorDate.setDate(today.getDate() - ((week - 1) * 7 + 1));
 
     data.weekAtOnboarding = week;
     data.onboardingDate = today;
