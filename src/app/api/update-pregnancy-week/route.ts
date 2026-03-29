@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   const todayBoston = getBostonDateOnly();
 
   const gestationalAnchorDate = new Date(todayBoston);
-  gestationalAnchorDate.setDate(gestationalAnchorDate.getDate() - (weekNumber - 1) * 7);
+  gestationalAnchorDate.setDate(gestationalAnchorDate.getDate() - ((weekNumber - 1) * 7 + 1));
 
   await prisma.participant.update({
     where: { id: session.participantId },
