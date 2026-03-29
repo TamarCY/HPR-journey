@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ActivityType, CompletionSource } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
+import { calculateStudyWeek } from "@/lib/studyWeek";
+import { getBostonDateOnly } from "@/lib/dates";
+import ActivityMediaPlayer from "@/components/ActivityMediaPlayer";
 
 export default async function ActivityPage({
   params,
@@ -25,10 +29,28 @@ export default async function ActivityPage({
     redirect("/app");
   }
 
+  const participant = await prisma.participant.findUnique({
+    where: { id: session.participantId },
+  });
+
+  if (!participant) {
+    redirect("/unauthorized");
+  }
+
+  const studyStart = participant.studyStartedAt ?? participant.onboardingCompletedAt;
+
+  if (!studyStart) {
+    redirect("/app/onboarding");
+  }
+
+  const studyWeek = calculateStudyWeek(studyStart);
+  const todayBoston = getBostonDateOnly();
+
   const progress = await prisma.activityProgress.findFirst({
     where: {
       participantId: session.participantId,
       activityId: activity.id,
+      ...(activity.type === ActivityType.BREATHING ? { progressDate: todayBoston } : {}),
     },
     orderBy: {
       createdAt: "desc",
@@ -71,31 +93,22 @@ export default async function ActivityPage({
           {/* Video */}
           {activity.videoUrl && (
             <div className="mt-5">
-              <video
-                key={activity.videoUrl}
-                src={activity.videoUrl}
-                controls
-                playsInline
-                muted
-                preload="metadata"
-                className="w-full rounded-[24px] bg-black"
-              >
-                Your browser does not support the video tag.
-              </video>
+              <ActivityMediaPlayer
+                activityId={activity.id}
+                videoUrl={activity.videoUrl}
+                audioUrl={activity.audioUrl}
+              />
             </div>
           )}
 
           {/* Audio */}
           {activity.audioUrl && (
-            <div className="mt-5 rounded-[24px] bg-[#f6efe7] p-4">
-              <audio
-                src={activity.audioUrl}
-                controls
-                preload="metadata"
-                className="w-full"
-              >
-                Your browser does not support the audio element.
-              </audio>
+            <div className="mt-5">
+              <ActivityMediaPlayer
+                activityId={activity.id}
+                videoUrl={activity.videoUrl}
+                audioUrl={activity.audioUrl}
+              />
             </div>
           )}
 
@@ -115,31 +128,79 @@ export default async function ActivityPage({
             </div>
           )}
         </div>
+
         <form
           action={async () => {
             "use server";
 
-            const existingProgress = await prisma.activityProgress.findFirst({
-              where: {
-                participantId: session.participantId,
-                activityId: activity.id,
-              },
-              orderBy: { createdAt: "desc" },
-            });
+            const now = new Date();
 
-            if (existingProgress) {
-              await prisma.activityProgress.update({
-                where: { id: existingProgress.id },
-                data: { completedAt: new Date() },
-              });
-            } else {
-              await prisma.activityProgress.create({
-                data: {
+            if (activity.type === ActivityType.BREATHING) {
+              const existingProgress = await prisma.activityProgress.findFirst({
+                where: {
                   participantId: session.participantId,
                   activityId: activity.id,
-                  completedAt: new Date(),
+                  progressDate: todayBoston,
                 },
+                orderBy: { createdAt: "desc" },
               });
+
+              if (existingProgress) {
+                await prisma.activityProgress.update({
+                  where: { id: existingProgress.id },
+                  data: {
+                    completedAt: now,
+                    completionSource: CompletionSource.FINISHED_BUTTON,
+                  },
+                });
+              } else {
+                await prisma.activityProgress.create({
+                  data: {
+                    participantId: session.participantId,
+                    activityId: activity.id,
+                    progressDate: todayBoston,
+                    startedAt: now,
+                    completedAt: now,
+                    completionSource: CompletionSource.FINISHED_BUTTON,
+                  },
+                });
+              }
+            } else {
+              const existingProgress = await prisma.activityProgress.findFirst({
+                where: {
+                  participantId: session.participantId,
+                  activityId: activity.id,
+                },
+                orderBy: { createdAt: "desc" },
+              });
+
+              if (existingProgress) {
+                await prisma.activityProgress.update({
+                  where: { id: existingProgress.id },
+                  data: {
+                    completedAt: now,
+                    assignedStudyWeek:
+                      activity.type === ActivityType.WEEKLY ? activity.studyWeek : null,
+                    completedStudyWeek:
+                      activity.type === ActivityType.WEEKLY ? studyWeek : null,
+                    completionSource: CompletionSource.FINISHED_BUTTON,
+                  },
+                });
+              } else {
+                await prisma.activityProgress.create({
+                  data: {
+                    participantId: session.participantId,
+                    activityId: activity.id,
+                    startedAt: now,
+                    completedAt: now,
+                    assignedStudyWeek:
+                      activity.type === ActivityType.WEEKLY ? activity.studyWeek : null,
+                    completedStudyWeek:
+                      activity.type === ActivityType.WEEKLY ? studyWeek : null,
+                    completionSource: CompletionSource.FINISHED_BUTTON,
+                  },
+                });
+              }
             }
 
             redirect("/app");
@@ -149,12 +210,11 @@ export default async function ActivityPage({
           <button
             type="submit"
             disabled={isCompleted}
-            className={`w-full rounded-xl px-4 py-3 text-base font-medium shadow-sm transition
-      ${
-        isCompleted
-          ? "bg-[#cfd8cc] text-white"
-          : "bg-[#6b8e6a] text-white hover:bg-[#5f815f]"
-      }`}
+            className={`w-full rounded-xl px-4 py-3 text-base font-medium shadow-sm transition ${
+              isCompleted
+                ? "bg-[#cfd8cc] text-white"
+                : "bg-[#6b8e6a] text-white hover:bg-[#5f815f]"
+            }`}
           >
             {isCompleted ? "✓ Completed" : "Mark as Completed"}
           </button>
