@@ -13,15 +13,17 @@ export async function POST(request: Request) {
   const { method, value } = body;
 
   const today = new Date();
+  const completedAt = new Date();
 
   let gestationalAnchorDate: Date | null = null;
 
   const data: any = {
-    onboardingCompletedAt: new Date(),
+    onboardingCompletedAt: completedAt,
+    studyStartedAt: completedAt,
     status: "ACTIVE",
   };
 
-  // 👉 WEEK
+  // WEEK
   if (method === "WEEK") {
     const week = Number(value);
 
@@ -40,7 +42,7 @@ export async function POST(request: Request) {
     data.datingMethod = "WEEK_AT_ONBOARDING";
   }
 
-  // 👉 EDD
+  // EDD
   if (method === "EDD") {
     const eddDate = new Date(value);
 
@@ -59,7 +61,7 @@ export async function POST(request: Request) {
     data.datingMethod = "EDD";
   }
 
-  // 👉 LMP
+  // LMP
   if (method === "LMP") {
     const lmpDate = new Date(value);
 
