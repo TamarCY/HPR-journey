@@ -67,6 +67,7 @@ model Participant {
   createdAt             DateTime          @default(now())
   lastSeenAt            DateTime?
   onboardingCompletedAt DateTime?
+  studyStartedAt        DateTime?
 
   tokens                ParticipantToken[]
   sessions              Session[]
@@ -115,6 +116,8 @@ model Activity {
   videoUrl         String?
   imageUrl         String?
 
+  studyWeek Int?
+
   // only relevant for breathing activities
   breathingSlot    BreathingSlot?
 
@@ -138,32 +141,33 @@ model Activity {
 }
 
 model ActivityProgress {
-  id               String           @id @default(uuid())
-  participantId    String
-  activityId       String
+  id                 String             @id @default(uuid())
+  participantId      String
+  activityId         String
 
-  // for daily breathing reset
-  progressDate     DateTime?        @db.Date
+  progressDate       DateTime?          @db.Date
+  pregnancyWeek      Int?
 
-  // snapshot of current pregnancy week when progress happened
-  pregnancyWeek    Int?
+  assignedStudyWeek  Int?
+  completedStudyWeek Int?
 
-  startedAt        DateTime?
-  completedAt      DateTime?
-  completionSource CompletionSource?
+  startedAt          DateTime?
+  completedAt        DateTime?
+  completionSource   CompletionSource?
 
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
-  participant      Participant      @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  activity         Activity         @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  participant        Participant        @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  activity           Activity           @relation(fields: [activityId], references: [id], onDelete: Cascade)
 
   @@index([participantId])
   @@index([activityId])
   @@index([progressDate])
   @@index([pregnancyWeek])
+  @@index([assignedStudyWeek])
+  @@index([completedStudyWeek])
 
-  // prevents duplicate daily progress rows for the same day
   @@unique([participantId, activityId, progressDate])
 }
 
