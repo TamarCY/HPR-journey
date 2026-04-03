@@ -35,7 +35,7 @@ export default async function DoctorFormPage() {
             },
           });
 
-          redirect("/app");
+          redirect("/app/doctor-form/print");
         }}
         className="mx-auto max-w-sm space-y-5 rounded-[28px] bg-[#fbf8f5] px-6 py-8 shadow-sm ring-1 ring-[#ece4dc]"
       >
@@ -104,15 +104,17 @@ export default async function DoctorFormPage() {
           />
         </div>
 
-        <button className="w-full rounded-xl bg-[#6b8e6a] py-3 text-white shadow-sm transition hover:bg-[#5f815f]">
-          Save
-        </button>
-        <Link
-          href="/app/doctor-form/print"
-          className="block w-full rounded-xl bg-white px-4 py-3 text-center text-[#4f4a46] shadow-sm ring-1 ring-[#ece4dc] transition hover:opacity-95"
-        >
-          Export for doctor
-        </Link>
+        <div className="flex gap-3">
+          <button className="flex-1 rounded-xl bg-[#6b8e6a] py-3 text-white shadow-sm transition hover:bg-[#5f815f]">
+            Save
+          </button>
+          <Link
+            href="/app/doctor-form/print"
+            className="flex-1 rounded-xl bg-white px-4 py-3 text-center text-[#4f4a46] shadow-sm ring-1 ring-[#ece4dc] transition hover:opacity-95"
+          >
+            Preview
+          </Link>
+        </div>
       </form>
     </main>
   );

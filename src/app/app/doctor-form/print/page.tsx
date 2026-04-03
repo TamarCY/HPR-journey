@@ -65,6 +65,13 @@ export default async function DoctorFormPrintPage() {
           Generated on {new Date().toLocaleDateString()}
         </p>
         <div className="mt-8 flex gap-3 print:hidden">
+          <Link
+            href="/app/doctor-form"
+            className="flex-1 rounded-lg bg-white px-3 py-2 text-sm text-center ring-1 ring-[#ece4dc]"
+          >
+            Edit
+          </Link>
+
           <div className="flex-1">
             <PrintButton />
           </div>
