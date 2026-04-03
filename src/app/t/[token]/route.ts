@@ -36,7 +36,13 @@ export async function GET(
     maxAge: 60 * 60 * 24 * 7,
   });
 
-  const redirectPath = participantToken.participant.eddDate ? "/app" : "/app/onboarding";
+  const hasCompletedOnboarding = Boolean(
+    participantToken.participant.onboardingCompletedAt &&
+    participantToken.participant.gestationalAnchorDate &&
+    participantToken.participant.studyStartedAt,
+  );
+
+  const redirectPath = hasCompletedOnboarding ? "/app" : "/app/onboarding";
 
   return NextResponse.redirect(new URL(redirectPath, request.url));
 }

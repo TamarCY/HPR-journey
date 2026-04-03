@@ -26,11 +26,16 @@ export default function HomePage() {
   };
 
   const handleOpenTestUser = () => {
-    const token = "0b7f476f00d84ed818b76b1962a83ae4100908ec504eea9d159f704edc887428";
+    const tokens = {
+      local: "998668e46d5078e34fceb3cd97a160d406d9306d11bd3ca252da92b4cb4649b1",
+      dev: "DEV_TOKEN",
+    };
 
-    const baseUrl = window.location.origin;
+    const isLocal = window.location.origin.includes("localhost");
 
-    window.location.href = `${baseUrl}/t/${token}`;
+    const token = isLocal ? tokens.local : tokens.dev;
+
+    window.location.href = `${window.location.origin}/t/${token}`;
   };
 
   return (
