@@ -10,6 +10,7 @@ import { prisma } from "@/lib/db";
 import { calculatePregnancyWeek, getGreeting } from "@/lib/pregnancy";
 import Image from "next/image";
 import EditPregnancyWeek from "@/components/EditPregnancyWeek";
+import { calculateStudyWeek } from "@/lib/studyWeek";
 
 export default async function AppPage() {
   const session = await getSession();
@@ -29,6 +30,14 @@ export default async function AppPage() {
   if (!participant.onboardingCompletedAt || !participant.gestationalAnchorDate) {
     redirect("/app/onboarding");
   }
+
+  const studyStart = participant.studyStartedAt ?? participant.onboardingCompletedAt;
+
+  if (!studyStart) {
+    redirect("/app/onboarding");
+  }
+
+  const studyWeek = calculateStudyWeek(studyStart);
 
   const pregnancyWeek = calculatePregnancyWeek(participant.gestationalAnchorDate);
   const greeting = getGreeting();
@@ -59,11 +68,20 @@ export default async function AppPage() {
     where: {
       type: ActivityType.WEEKLY,
       isActive: true,
-      minPregnancyWeek: { lte: pregnancyWeek },
-      maxPregnancyWeek: { gte: pregnancyWeek },
+      studyWeek,
+    },
+  });
+
+  const pastWeeklyTasks = await prisma.activity.findMany({
+    where: {
+      type: ActivityType.WEEKLY,
+      isActive: true,
+      studyWeek: {
+        lt: studyWeek,
+      },
     },
     orderBy: {
-      orderIndex: "asc",
+      studyWeek: "desc",
     },
   });
 
@@ -89,6 +107,7 @@ export default async function AppPage() {
           <p className="mt-2 text-[1rem] text-[#6d6661]">
             you&apos;re in week <EditPregnancyWeek currentWeek={pregnancyWeek} />
           </p>
+          <p className="mt-1 text-sm text-[#9c948d]">Study week {studyWeek}</p>
         </section>
 
         <section className="grid grid-cols-2 gap-3">
