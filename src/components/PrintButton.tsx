@@ -5,9 +5,9 @@ export default function PrintButton() {
     <button
       type="button"
       onClick={() => window.print()}
-      className="w-full rounded-xl bg-black px-4 py-3 text-white"
+      className="w-full rounded-lg bg-white px-3 py-2 text-sm text-[#4f4a46] ring-1 ring-[#ece4dc]"
     >
-      Print / Save as PDF
+      Print
     </button>
   );
 }
