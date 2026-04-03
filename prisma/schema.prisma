@@ -68,6 +68,7 @@ model Participant {
   lastSeenAt            DateTime?
   onboardingCompletedAt DateTime?
   studyStartedAt        DateTime?
+  doctorFormJson        Json?
 
   tokens                ParticipantToken[]
   sessions              Session[]

@@ -228,6 +228,15 @@ export default async function ActivityPage({
             {isCompleted ? "✓ Completed" : "Mark as Completed"}
           </button>
         </form>
+
+        {activity.contentText && (
+          <Link
+            href="/app/doctor-form"
+            className="mt-4 block text-center rounded-xl bg-white px-4 py-3 shadow-sm"
+          >
+            Request for Doctor
+          </Link>
+        )}
       </div>
     </main>
   );
