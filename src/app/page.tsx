@@ -28,7 +28,7 @@ export default function HomePage() {
   const handleOpenTestUser = () => {
     const tokens = {
       local: "998668e46d5078e34fceb3cd97a160d406d9306d11bd3ca252da92b4cb4649b1",
-      dev: "DEV_TOKEN",
+      dev: "574a45141d9ccb9a2dcc14d61f5160bcd789064ef3bca3745089be555697247f",
     };
 
     const isLocal = window.location.origin.includes("localhost");
