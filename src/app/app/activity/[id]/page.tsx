@@ -129,6 +129,15 @@ export default async function ActivityPage({
           )}
         </div>
 
+        {activity.type === ActivityType.WEEKLY && (
+          <Link
+            href="/app/past-tasks"
+            className="mt-4 block text-center rounded-xl bg-white px-4 py-3 text-base font-medium text-[#6d6661] shadow-sm ring-1 ring-[#ece4dc] hover:opacity-95"
+          >
+            View Past Tasks
+          </Link>
+        )}
+
         <form
           action={async () => {
             "use server";
