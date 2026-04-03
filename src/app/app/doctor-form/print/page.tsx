@@ -61,6 +61,9 @@ export default async function DoctorFormPrintPage() {
         <p className="mt-8 text-sm text-gray-600">
           Thank you for supporting trauma-informed care.
         </p>
+        <p className="mt-6 text-xs text-gray-500">
+          Generated on {new Date().toLocaleDateString()}
+        </p>
         <div className="mt-8 flex gap-3 print:hidden">
           <div className="flex-1">
             <PrintButton />
