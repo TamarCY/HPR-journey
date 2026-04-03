@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
+import Link from "next/link";
 
 export default async function DoctorFormPage() {
   const session = await getSession();
@@ -88,6 +89,12 @@ export default async function DoctorFormPage() {
         />
 
         <button className="w-full rounded-xl bg-[#6b8e6a] py-3 text-white">Save</button>
+        <Link
+          href="/app/doctor-form/print"
+          className="block w-full rounded-xl bg-white px-4 py-3 text-center shadow-sm ring-1 ring-[#ece4dc]"
+        >
+          Export for doctor
+        </Link>
       </form>
     </main>
   );
