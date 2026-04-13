@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ActivityType } from "@prisma/client";
+import { ActivityType, EventType } from "@prisma/client";
 
 import { getSession } from "@/lib/getSession";
 import { prisma } from "@/lib/db";
 import { calculateStudyWeek } from "@/lib/studyWeek";
+import { logEvent } from "@/lib/logEvent";
+import { calculatePregnancyWeek } from "@/lib/pregnancy";
+import PastTaskLink from "@/components/PastTaskLink";
 
 export default async function PastTasksPage() {
   const session = await getSession();
@@ -28,6 +31,16 @@ export default async function PastTasksPage() {
   }
 
   const studyWeek = calculateStudyWeek(studyStart);
+  const pregnancyWeek = participant.gestationalAnchorDate
+    ? calculatePregnancyWeek(participant.gestationalAnchorDate)
+    : null;
+
+  await logEvent({
+    participantId: session.participantId,
+    eventType: EventType.PAST_TASKS_VIEWED,
+    pregnancyWeek,
+    metadata: { studyWeek },
+  });
 
   const pastWeeklyTasks = await prisma.activity.findMany({
     where: {
@@ -63,9 +76,9 @@ export default async function PastTasksPage() {
           {pastWeeklyTasks.length > 0 ? (
             <div className="mt-4 space-y-3">
               {pastWeeklyTasks.map((task) => (
-                <Link
+                <PastTaskLink
                   key={task.id}
-                  href={`/app/activity/${task.id}`}
+                  taskId={task.id}
                   className="flex items-center justify-between rounded-2xl bg-white px-4 py-4 shadow-sm ring-1 ring-[#ece4dc] transition hover:opacity-95"
                 >
                   <div>
@@ -83,7 +96,7 @@ export default async function PastTasksPage() {
                   </div>
 
                   <span className="text-2xl text-[#6d6661]">›</span>
-                </Link>
+                </PastTaskLink>
               ))}
             </div>
           ) : (

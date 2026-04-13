@@ -1,6 +1,9 @@
+import { EventType } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
 import { NextResponse } from "next/server";
+import { logEvent } from "@/lib/logEvent";
+import { calculatePregnancyWeek } from "@/lib/pregnancy";
 
 export async function POST(request: Request) {
   const session = await getSession();
@@ -94,6 +97,14 @@ export async function POST(request: Request) {
   await prisma.participant.update({
     where: { id: session.participantId },
     data,
+  });
+
+  const pregnancyWeek = calculatePregnancyWeek(gestationalAnchorDate);
+
+  await logEvent({
+    participantId: session.participantId,
+    eventType: EventType.ONBOARDING_COMPLETED,
+    pregnancyWeek,
   });
 
   return NextResponse.json({ success: true });

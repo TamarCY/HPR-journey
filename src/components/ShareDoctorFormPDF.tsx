@@ -24,6 +24,12 @@ export default function ShareDoctorFormPDF({ text }: Props) {
         files: [file],
         title: "Patient Care Request",
       });
+
+      fetch("/api/log-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventType: "DOCTOR_FORM_PDF_SHARED" }),
+      });
     } else {
       alert("Sharing not supported on this device");
     }

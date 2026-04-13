@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { EventType } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
+import { logEvent } from "@/lib/logEvent";
+import { calculatePregnancyWeek } from "@/lib/pregnancy";
 import PrintButton from "@/components/PrintButton";
 import DownloadDoctorFormPDF from "@/components/DownloadDoctorFormPDF";
 import SaveDoctorFormPDF from "@/components/SaveDoctorFormPDF";
@@ -17,6 +20,16 @@ export default async function DoctorFormPrintPage() {
   });
 
   if (!participant) redirect("/unauthorized");
+
+  const pregnancyWeek = participant.gestationalAnchorDate
+    ? calculatePregnancyWeek(participant.gestationalAnchorDate)
+    : null;
+
+  await logEvent({
+    participantId: session.participantId,
+    eventType: EventType.DOCTOR_FORM_PREVIEWED,
+    pregnancyWeek,
+  });
 
   const form = participant.doctorFormJson as {
     explainBeforeTouching?: boolean;

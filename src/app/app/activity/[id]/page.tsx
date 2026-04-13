@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ActivityType, CompletionSource } from "@prisma/client";
+import { ActivityType, CompletionSource, EventType } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
 import { calculateStudyWeek } from "@/lib/studyWeek";
 import { getBostonDateOnly } from "@/lib/dates";
 import ActivityMediaPlayer from "@/components/ActivityMediaPlayer";
+import { logEvent } from "@/lib/logEvent";
+import { calculatePregnancyWeek } from "@/lib/pregnancy";
 
 export default async function ActivityPage({
   params,
@@ -45,6 +47,26 @@ export default async function ActivityPage({
 
   const studyWeek = calculateStudyWeek(studyStart);
   const todayBoston = getBostonDateOnly();
+  const pregnancyWeek = participant.gestationalAnchorDate
+    ? calculatePregnancyWeek(participant.gestationalAnchorDate)
+    : null;
+
+  await logEvent({
+    participantId: session.participantId,
+    eventType: EventType.ACTIVITY_STARTED,
+    pregnancyWeek,
+    activityId: activity.id,
+    metadata: { studyWeek },
+  });
+
+  if (activity.type === ActivityType.TEST_PREP) {
+    await logEvent({
+      participantId: session.participantId,
+      eventType: EventType.TEST_PREP_VIEWED,
+      pregnancyWeek,
+      activityId: activity.id,
+    });
+  }
 
   const progress = await prisma.activityProgress.findFirst({
     where: {
@@ -195,6 +217,17 @@ export default async function ActivityPage({
                 });
               }
             }
+
+            await logEvent({
+              participantId: session.participantId,
+              eventType: EventType.ACTIVITY_COMPLETED,
+              pregnancyWeek,
+              activityId: activity.id,
+              metadata: {
+                completionSource: CompletionSource.FINISHED_BUTTON,
+                studyWeek,
+              },
+            });
 
             redirect("/app");
           }}

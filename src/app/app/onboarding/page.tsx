@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -8,6 +8,18 @@ type Method = "EDD" | "LMP" | "WEEK";
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const startedLoggedRef = useRef(false);
+
+  useEffect(() => {
+    if (startedLoggedRef.current) return;
+    startedLoggedRef.current = true;
+
+    fetch("/api/log-event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ eventType: "ONBOARDING_STARTED" }),
+    });
+  }, []);
 
   const [method, setMethod] = useState<Method>("EDD");
   const [value, setValue] = useState("");

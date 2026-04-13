@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { EventType } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
 import { getBostonDateOnly } from "@/lib/dates";
+import { logEvent } from "@/lib/logEvent";
 
 export async function POST(request: Request) {
   const session = await getSession();
@@ -31,6 +33,13 @@ export async function POST(request: Request) {
       datingMethod: "MANUAL_EDIT",
       lastManualWeekEditAt: new Date(),
     },
+  });
+
+  await logEvent({
+    participantId: session.participantId,
+    eventType: EventType.PREGNANCY_WEEK_EDITED,
+    pregnancyWeek: weekNumber,
+    metadata: { newWeek: weekNumber },
   });
 
   return NextResponse.json({ success: true });

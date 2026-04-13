@@ -8,23 +8,35 @@ type Props = {
   audioUrl?: string | null;
 };
 
+async function logActivityEvent(eventType: string, activityId: string) {
+  await fetch("/api/log-event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ eventType, activityId }),
+  });
+}
+
 export default function ActivityMediaPlayer({ activityId, videoUrl, audioUrl }: Props) {
-  const [hasStarted, setHasStarted] = useState(false);
   const [hasCompletedByPlayback, setHasCompletedByPlayback] = useState(false);
   const startedLoggedRef = useRef(false);
+  const playback80LoggedRef = useRef(false);
 
   const markStarted = async () => {
     if (startedLoggedRef.current) return;
     startedLoggedRef.current = true;
-    setHasStarted(true);
 
-    // later we can add /api/log-event here
+    await logActivityEvent("PLAYBACK_STARTED", activityId);
   };
 
   const markCompletedByPlayback = async () => {
     if (hasCompletedByPlayback) return;
 
     setHasCompletedByPlayback(true);
+
+    if (!playback80LoggedRef.current) {
+      playback80LoggedRef.current = true;
+      await logActivityEvent("PLAYBACK_80", activityId);
+    }
 
     await fetch("/api/complete-activity", {
       method: "POST",

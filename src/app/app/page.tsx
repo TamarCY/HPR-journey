@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ActivityType, BreathingSlot } from "@prisma/client";
+import { ActivityType, BreathingSlot, EventType } from "@prisma/client";
 
 import { getSession } from "@/lib/getSession";
 import { prisma } from "@/lib/db";
@@ -11,6 +11,7 @@ import { calculatePregnancyWeek, getGreeting } from "@/lib/pregnancy";
 import Image from "next/image";
 import EditPregnancyWeek from "@/components/EditPregnancyWeek";
 import { calculateStudyWeek } from "@/lib/studyWeek";
+import { logEvent } from "@/lib/logEvent";
 
 export default async function AppPage() {
   const session = await getSession();
@@ -41,6 +42,12 @@ export default async function AppPage() {
 
   const pregnancyWeek = calculatePregnancyWeek(participant.gestationalAnchorDate);
   const greeting = getGreeting();
+
+  await logEvent({
+    participantId: session.participantId,
+    eventType: EventType.PAGE_OPEN,
+    pregnancyWeek,
+  });
 
   const morningBreathing = await prisma.activity.findFirst({
     where: {

@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
+import { EventType } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
+import { logEvent } from "@/lib/logEvent";
+import { calculatePregnancyWeek } from "@/lib/pregnancy";
 import Link from "next/link";
 
 export default async function DoctorFormPage() {
@@ -15,6 +18,17 @@ export default async function DoctorFormPage() {
   if (!participant) redirect("/unauthorized");
 
   const existing = participant.doctorFormJson as any;
+  const isFirstSave = !existing;
+
+  const pregnancyWeek = participant.gestationalAnchorDate
+    ? calculatePregnancyWeek(participant.gestationalAnchorDate)
+    : null;
+
+  await logEvent({
+    participantId: session.participantId,
+    eventType: EventType.DOCTOR_FORM_VIEWED,
+    pregnancyWeek,
+  });
 
   return (
     <main className="min-h-screen bg-[#f7f3ef] px-5 py-6 text-[#4f4a46]">
@@ -33,6 +47,14 @@ export default async function DoctorFormPage() {
                 notes: String(formData.get("notes") ?? ""),
               },
             },
+          });
+
+          await logEvent({
+            participantId: session.participantId,
+            eventType: isFirstSave
+              ? EventType.DOCTOR_FORM_SAVED
+              : EventType.DOCTOR_FORM_EDITED,
+            pregnancyWeek,
           });
 
           redirect("/app/doctor-form/print");

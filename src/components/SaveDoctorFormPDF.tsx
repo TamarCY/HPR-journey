@@ -16,6 +16,12 @@ export default function SaveDoctorFormPDF({ text }: Props) {
     doc.text(lines, 15, 20);
 
     doc.save("patient-care-request.pdf");
+
+    fetch("/api/log-event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ eventType: "DOCTOR_FORM_PDF_SAVED" }),
+    });
   };
 
   return (
