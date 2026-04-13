@@ -62,12 +62,10 @@ export default async function ActivityPage({
   return (
     <main className="min-h-screen bg-[#f7f3ef] px-5 py-6 text-[#4f4a46]">
       <div className="mx-auto max-w-sm space-y-5 pb-24">
-        {/* Back */}
         <Link href="/app" className="inline-block text-sm text-[#6d6661]">
           ← Back
         </Link>
 
-        {/* Card */}
         <div className="rounded-[28px] bg-[#fbf8f5] px-6 py-8 shadow-sm ring-1 ring-[#ece4dc]">
           <h1 className="font-serif text-[2rem] font-semibold leading-tight text-[#586b56]">
             {activity.title}
@@ -79,7 +77,6 @@ export default async function ActivityPage({
             </p>
           )}
 
-          {/* Image */}
           {activity.imageUrl && (
             <div className="mt-5 overflow-hidden rounded-[24px] bg-[#f6efe7]">
               <img
@@ -90,8 +87,7 @@ export default async function ActivityPage({
             </div>
           )}
 
-          {/* Video */}
-          {activity.videoUrl && (
+          {(activity.videoUrl || activity.audioUrl) && (
             <div className="mt-5">
               <ActivityMediaPlayer
                 activityId={activity.id}
@@ -101,22 +97,10 @@ export default async function ActivityPage({
             </div>
           )}
 
-          {/* Audio */}
-          {activity.audioUrl && (
-            <div className="mt-5">
-              <ActivityMediaPlayer
-                activityId={activity.id}
-                videoUrl={activity.videoUrl}
-                audioUrl={activity.audioUrl}
-              />
-            </div>
-          )}
-
-          {/* Text content */}
           {activity.contentText && (
             <div className="mt-5 rounded-[24px] bg-[#f6efe7] p-5">
               <div
-                className="text-[0.98rem] leading-7 text-[#6d6661] space-y-3 [&_ul]:pl-5 [&_ul]:list-disc"
+                className="space-y-3 text-[0.98rem] leading-7 text-[#6d6661] [&_ul]:list-disc [&_ul]:pl-5"
                 dangerouslySetInnerHTML={{ __html: activity.contentText }}
               />
             </div>
@@ -132,7 +116,7 @@ export default async function ActivityPage({
         {activity.type === ActivityType.WEEKLY && (
           <Link
             href="/app/past-tasks"
-            className="mt-4 block text-center rounded-xl bg-white px-4 py-3 text-base font-medium text-[#6d6661] shadow-sm ring-1 ring-[#ece4dc] hover:opacity-95"
+            className="mt-4 block rounded-xl bg-white px-4 py-3 text-center text-base font-medium text-[#6d6661] shadow-sm ring-1 ring-[#ece4dc] hover:opacity-95"
           >
             View Past Tasks
           </Link>
@@ -232,7 +216,7 @@ export default async function ActivityPage({
         {activity.contentText && (
           <Link
             href="/app/doctor-form"
-            className="mt-4 block text-center rounded-xl bg-white px-4 py-3 shadow-sm"
+            className="mt-4 block rounded-xl bg-white px-4 py-3 text-center shadow-sm"
           >
             Request for Doctor
           </Link>

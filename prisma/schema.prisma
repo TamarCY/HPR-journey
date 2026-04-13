@@ -42,7 +42,9 @@ enum EventType {
   ONBOARDING_COMPLETED
   ACTIVITY_STARTED
   ACTIVITY_COMPLETED
+  DOCTOR_FORM_SAVED
 }
+
 
 model Participant {
   id                    String            @id @default(uuid())

@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "EventType" ADD VALUE 'DOCTOR_FORM_SAVED';
